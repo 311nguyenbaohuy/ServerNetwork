@@ -23,8 +23,8 @@ public class User {
         this.ip_addr = ip_addr;
         this.status = stauts;
     }
-    public User(){
-        
-    }
+    public User(){}
+    
+    public int getID() { return id; }
     
 }

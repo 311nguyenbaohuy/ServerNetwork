@@ -5,11 +5,15 @@
  */
 package DAO;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.*;
+
 
 /**
  *
@@ -80,6 +84,65 @@ public class SQLServerConn {
         }
     }
     
+    // If insert successful return true else return fasle
+    public static boolean createFriendRequest(String userName, String friendName) throws SQLException{
+        Connection conn = getSQLServerConnection();
+        Statement stmt = conn.createStatement();
+        User user = getUserByName(userName);
+        User friend = getUserByName(friendName);
+        
+        int userID = user.getID();
+        int friendID = friend.getID();
+
+        String query = "INSERT INTO dbo.FRIEND_REQUEST (User_Id, Friend_Id) VALUES (" + userID + "," + friendID + ")";
+        
+        return stmt.execute(query);
+    }
     
+    // Insert to FRIEND and Delete FriendRequest
     
+    public static int acceptRequest(int userID, int friendID) throws SQLException{
+        Connection conn = getSQLServerConnection();
+        
+        String runSP = "{? = call dbo.p_add_list_friend (?, ?)}";
+        CallableStatement cstmt = conn.prepareCall(runSP);
+        cstmt.registerOutParameter(1, java.sql.Types.INTEGER);
+        cstmt.setInt(2, userID);
+        cstmt.setInt(3, friendID);
+        cstmt.execute();
+        return cstmt.getInt(1);
+        // return 0 for success else fail.
+    }
+    
+    // Find list Friend
+    public static List<User> getListFriend(int userID) throws SQLException{
+        Connection conn = getSQLServerConnection();
+        Statement stmt = conn.createStatement();
+        
+        String query = "SELECT USER_ACCOUNT.User_Id, User_Name, User_Password, IP_addr, Status FROM  dbo.USER_ACCOUNT, dbo.FRIEND WHERE USER_ACCOUNT.User_Id = FRIEND.User_Id AND USER_ACCOUNT.User_Id <>" + userID;
+        ResultSet rs = stmt.executeQuery(query);
+        List<User> lstFriend = new ArrayList<>();
+        while(rs.next()){
+            User usr = new User(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5));
+            lstFriend.add(usr);
+        }
+        return lstFriend;
+    }
+    
+    public static List<User> getRequest(int userID) throws SQLException{
+        Connection conn = getSQLServerConnection();
+        Statement stmt = conn.createStatement();
+
+        String query = "SELECT USER_ACCOUNT.User_Id, User_Name, User_Password, IP_addr, Status \n" +
+                       "FROM dbo.USER_ACCOUNT, dbo.FRIEND_REQUEST \n" +
+                        "WHERE FRIEND_REQUEST.User_Id = USER_ACCOUNT.User_Id  " +
+                        "AND Friend_Id = " + userID;
+        ResultSet rs = stmt.executeQuery(query);
+        List<User> lstFriend = new ArrayList<>();
+        while(rs.next()){
+            User usr = new User(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5));
+            lstFriend.add(usr);
+        }
+        return lstFriend;
+    }
 }
