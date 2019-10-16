@@ -63,11 +63,16 @@ public class SQLServerConn {
     }
 
     // CREATE ACCOUNT, INSERT TO DB
-    public static void CreateAccount (String userName, String password) throws SQLException{
+    public static boolean CreateAccount (String userName, String password) throws SQLException{
         Connection conn = getSQLServerConnection();
         Statement stmt = conn.createStatement();
         String query = "INSERT INTO dbo.USER_ACCOUNT (User_Name, User_Password) VALUES ('" + userName + "', '" + password + "')";
-        stmt.execute(query);
+        try {
+            stmt.execute(query);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
   }
   
     
@@ -100,9 +105,10 @@ public class SQLServerConn {
     }
     
     // Insert to FRIEND and Delete FriendRequest
-    
-    public static int acceptRequest(int userID, int friendID) throws SQLException{
+    public static int acceptRequest(String userName, String friendName) throws SQLException{
         Connection conn = getSQLServerConnection();
+        int userID = getUserByName(userName).getID();
+        int friendID = getUserByName(friendName).getID();
         
         String runSP = "{? = call dbo.p_add_list_friend (?, ?)}";
         CallableStatement cstmt = conn.prepareCall(runSP);
@@ -115,10 +121,11 @@ public class SQLServerConn {
     }
     
     // Find list Friend
-    public static List<User> getListFriend(int userID) throws SQLException{
+    public static List<User> getListFriend(String userName) throws SQLException{
         Connection conn = getSQLServerConnection();
         Statement stmt = conn.createStatement();
-        
+        User user = getUserByName(userName);
+        int userID = user.getID();
         String query = "SELECT USER_ACCOUNT.User_Id, User_Name, User_Password, IP_addr, Status FROM  dbo.USER_ACCOUNT, dbo.FRIEND WHERE USER_ACCOUNT.User_Id = FRIEND.User_Id AND USER_ACCOUNT.User_Id <>" + userID;
         ResultSet rs = stmt.executeQuery(query);
         List<User> lstFriend = new ArrayList<>();
@@ -129,10 +136,11 @@ public class SQLServerConn {
         return lstFriend;
     }
     
-    public static List<User> getRequest(int userID) throws SQLException{
+    public static List<User> getRequest(String userName) throws SQLException{
         Connection conn = getSQLServerConnection();
         Statement stmt = conn.createStatement();
-
+        User user = getUserByName(userName);
+        int userID = user.getID();
         String query = "SELECT USER_ACCOUNT.User_Id, User_Name, User_Password, IP_addr, Status \n" +
                        "FROM dbo.USER_ACCOUNT, dbo.FRIEND_REQUEST \n" +
                         "WHERE FRIEND_REQUEST.User_Id = USER_ACCOUNT.User_Id  " +
@@ -145,4 +153,16 @@ public class SQLServerConn {
         }
         return lstFriend;
     }
+    
+    public static void deleteRequest(String userName, String friendName) throws SQLException{
+        Connection conn = getSQLServerConnection();
+        Statement stmt = conn.createStatement();
+        int userID = getUserByName(userName).getID();
+        int friendID = getUserByName(friendName).getID();
+        
+        String query = "DELETE FROM dbo.FRIEND_REQUEST WHERE USER_ID = " + userID + " AND Friend_Id = " + friendID;
+        stmt.executeQuery(query); 
+    }
+    
+    // REMOVE request add friend.
 }

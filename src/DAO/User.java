@@ -23,8 +23,18 @@ public class User {
         this.ip_addr = ip_addr;
         this.status = stauts;
     }
+    
+        public User(int id, String user_name, String ip_addr, int stauts) {
+        this.id = id;
+        this.user_name = user_name;
+        this.ip_addr = ip_addr;
+        this.status = stauts;
+    }
+    
     public User(){}
     
     public int getID() { return id; }
-    
+    public String getUser_name() { return user_name;}
+    public String getIP_addr() { return ip_addr;}
+    public int getStatus() {return status;}
 }

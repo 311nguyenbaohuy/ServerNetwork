@@ -22,7 +22,9 @@ public class TagWriter {
         myOs.write(tv.getContent());
     }
     public void close() throws IOException {
-            myOs.flush();
-            myOs.close();
+        myOs.close();
+    }
+    public void flush() throws IOException{
+        myOs.flush();
     }
 }
