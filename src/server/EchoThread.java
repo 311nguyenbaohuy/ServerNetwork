@@ -142,10 +142,12 @@ public class EchoThread extends Thread{
                         String friends = "<";
                         for (User user : users) {
                             friends = friends + user.getID() + " " + user.getUser_name() + " " + 
-                                                user.getIP_addr() + " " + user.getStatus() + "|";
+                                                user.getIP_addr() + " " + user.getStatus() + "|";                        
+                            System.out.println(user.getUser_name());
+                            
                         }
                         friends = friends.substring(0, friends.length() - 1) + ">";
-                        System.out.println(friends);
+
                         writer.writeTag(new TagValue(Tags.SUCCESS, friends.getBytes()));
                         writer.flush();    
                     }

@@ -126,7 +126,9 @@ public class SQLServerConn {
         Statement stmt = conn.createStatement();
         User user = getUserByName(userName);
         int userID = user.getID();
-        String query = "SELECT USER_ACCOUNT.User_Id, User_Name, User_Password, IP_addr, Status FROM  dbo.USER_ACCOUNT, dbo.FRIEND WHERE USER_ACCOUNT.User_Id = FRIEND.User_Id AND USER_ACCOUNT.User_Id <>" + userID;
+        String query = "SELECT USER_ACCOUNT.User_Id, User_Name, User_Password, IP_addr, Status FROM dbo.USER_ACCOUNT, "
+                + "(SELECT * FROM dbo.FRIEND WHERE User_Id = " + userID
+                + ")temp WHERE USER_ACCOUNT.User_Id = temp.Friend_Id";
         ResultSet rs = stmt.executeQuery(query);
         List<User> lstFriend = new ArrayList<>();
         while(rs.next()){
