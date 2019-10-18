@@ -38,6 +38,8 @@ public class EchoThread extends Thread{
     }
     
     public void run(){
+        boolean complete = false;
+       
         // Xu ly yeu cau cua client
         try{
             reader = new TagReader(conn.getInputStream());  
@@ -189,4 +191,5 @@ public class EchoThread extends Thread{
             Logger.getLogger(EchoThread.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
 }

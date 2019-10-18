@@ -41,13 +41,14 @@ public class SQLServerConn {
     // CHECK LOGIN, ENABLE ONLINE AND UPDATE IP_ADDR
     public static boolean Login(String userName, String password, String IP_addr) throws SQLException{
         Connection conn = getSQLServerConnection();
-        String query = "UPDATE dbo.USER_ACCOUNT SET IP_addr = ?, Status = 1 WHERE User_Name = ? AND User_Password = ?";
+        String query = "UPDATE dbo.USER_ACCOUNT SET IP_addr = ?, Status = 1 "
+                + "WHERE User_Name = ? AND User_Password = ?";
         CallableStatement cstmt = conn.prepareCall(query);
         cstmt.setString(1, IP_addr);
         cstmt.setString(2, userName);
         cstmt.setString(3, password);
 
-        return cstmt.executeUpdate() == 0;
+        return cstmt.executeUpdate() != 0;
   }
   
     // Logout
