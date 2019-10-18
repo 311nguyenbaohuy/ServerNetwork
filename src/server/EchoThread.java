@@ -50,7 +50,7 @@ public class EchoThread extends Thread{
 //            System.out.println(content);
             content = content.replace("<", "");
             content = content.replace(">", "");
-            
+            User usr;
             String[] arrContent;
             boolean isOK;
             
@@ -61,8 +61,10 @@ public class EchoThread extends Thread{
                     arrContent = content.split(" ");
                     isOK = Login(arrContent[0], arrContent[1], arrContent[2]);
                     if (isOK){
-                        System.out.println("OK");
-                        writer.writeTag(new TagValue(Tags.SUCCESS, "<>".getBytes()));
+                        usr = getUserByName(arrContent[0]);
+                        String usrFound = "<" + usr.getID() + " " + usr.getUser_name() + " " + 
+                                                usr.getIP_addr() + " " + usr.getStatus() + ">";
+                        writer.writeTag(new TagValue(Tags.SUCCESS, usrFound.getBytes()));
                         writer.flush();
                     }
                     else{
@@ -97,7 +99,7 @@ public class EchoThread extends Thread{
                 
                 // SEARCH
                 case Tags.SEARCH:
-                    User usr = getUserByName(content);
+                    usr = getUserByName(content);
                     if (usr.getID() == 0){
                         // Can't find user
                         writer.writeTag(new TagValue(Tags.FAIL, "<>".getBytes()));
