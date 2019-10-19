@@ -166,12 +166,15 @@ public class SQLServerConn {
     
     public static void deleteRequest(String userName, String friendName) throws SQLException{
         Connection conn = getSQLServerConnection();
-        Statement stmt = conn.createStatement();
+  
         int userID = getUserByName(userName).getID();
         int friendID = getUserByName(friendName).getID();
         
-        String query = "DELETE FROM dbo.FRIEND_REQUEST WHERE USER_ID = " + userID + " AND Friend_Id = " + friendID;
-        stmt.executeQuery(query); 
+        String query = "DELETE FROM dbo.FRIEND_REQUEST WHERE USER_ID = ? AND Friend_Id = ?";
+        CallableStatement cstmt = conn.prepareCall(query);
+        cstmt.setString(1, Integer.toString(userID));
+        cstmt.setString(2, Integer.toString(friendID));
+        cstmt.execute();
     }
     // REMOVE request add friend.
 }
