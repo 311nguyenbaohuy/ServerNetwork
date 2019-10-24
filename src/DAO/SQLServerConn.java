@@ -177,4 +177,63 @@ public class SQLServerConn {
         cstmt.execute();
     }
     // REMOVE request add friend.
+    
+    public static boolean createGroup(String groupName, String userName) throws SQLException {
+        Connection conn = getSQLServerConnection();      
+       
+        String query = "INSERT INTO dbo.GROUP_CHAT VALUES (?, ?)";
+        CallableStatement cstmt = conn.prepareCall(query);
+        cstmt.setString(1, groupName);
+        cstmt.setString(2, userName);
+        try {
+            cstmt.execute();
+            return true;
+        } catch (Exception e) {
+            return false;   
+        }
+    }
+    
+    public static boolean leaveGroup(String groupName, String userName) throws SQLException {
+        Connection conn = getSQLServerConnection();      
+       
+        String query = "DELETE FROM dbo.GROUP_CHAT WHERE group_name = ? AND USER_NAME = ?";
+        CallableStatement cstmt = conn.prepareCall(query);
+        cstmt.setString(1, groupName);
+        cstmt.setString(2, userName);
+        try {
+            cstmt.execute();
+            return true;
+        } catch (Exception e) {
+            return false;   
+        }
+    }
+    
+    public static List<User> getMember(String groupName) throws SQLException{
+        Connection conn = getSQLServerConnection();      
+       
+        String query = "SELECT User_Id, GROUP_CHAT.user_name, User_Password, IP_addr, Status FROM dbo.USER_ACCOUNT, dbo.GROUP_CHAT WHERE GROUP_CHAT.user_name = USER_ACCOUNT.User_Name AND group_name = ?";
+        CallableStatement cstmt = conn.prepareCall(query);
+        cstmt.setString(1, groupName);
+        ResultSet rs = cstmt.executeQuery();
+        List<User> listUsers = new ArrayList<>();
+        while (rs.next()){
+            User usr = new User(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5));
+            listUsers.add(usr);
+        }
+        return listUsers;
+    }
+    
+    public static List<String> getMyGroup(String userName) throws SQLException{
+        Connection conn = getSQLServerConnection();      
+       
+        String query = "SELECT group_name FROM dbo.GROUP_CHAT WHERE USER_NAME = ?";
+        CallableStatement cstmt = conn.prepareCall(query);
+        cstmt.setString(1, userName);
+        ResultSet rs = cstmt.executeQuery();
+        List<String> list = new ArrayList<String>();
+        while (rs.next()){
+            list.add(rs.getString(1));
+        }
+        return list;
+    }
 }

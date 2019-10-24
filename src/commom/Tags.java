@@ -32,5 +32,15 @@ public class Tags {
 
     public static final String DELETE = "<DELETE>";
     
+    public static final String CREATE = "<CREATE>";
+    
+    public static final String LEAVE = "<LEAVE>";
+    
+    public static final String JOIN = "<JOIN>";
+    
+    public static final String GET_MY_GROUP = "<GET_MY_GROUP>";
+    
+    public static final String GET_MEMBER = "<GET_MEMBER>";
+    
     public static final int MAX_VALUE_LENGTH = 1024;
 }
